@@ -8,7 +8,7 @@ from Crypto.Cipher import DES
 app = Flask(__name__)
 app.config.from_object('nginxauthdaemon.config.DefaultConfig')
 app.config.from_envvar('DAEMON_SETTINGS', True)
-
+custom_auth_url_prefix=app.config['AUTH_URL_PREFIX']
 
 def get_authenticator():
     auth = getattr(g, '_authenticator', None)
@@ -45,18 +45,18 @@ def parse_authorization(original_value):
 
 def create_session_cookie(username):
     """Create session cookie. Returns string"""
-    des = DES.new(app.config['DES_KEY'], DES.MODE_ECB, app.config['DES_IV'])
+    des = DES.new(app.config['DES_KEY'], DES.MODE_ECB)
     clear_text = username + app.config['SESSION_SALT']
     if len(clear_text) % 8 != 0:
         clear_text = clear_text.ljust((len(clear_text) / 8 + 1) * 8, ' ')
-    return base64.encodestring(des.encrypt(clear_text))
+    return base64.encodestring(des.encrypt(clear_text.encode('utf-8')))
 
 
 def decode_session_cookie(cookie):
     """Decode session cookie and return user name"""
     try:
         encrypted = base64.decodestring(cookie)
-        des = DES.new(app.config['DES_KEY'], DES.MODE_ECB, app.config['DES_IV'])
+        des = DES.new(app.config['DES_KEY'], DES.MODE_ECB)
         decrypted = des.decrypt(encrypted).rstrip()
         session_salt = app.config['SESSION_SALT']
         if decrypted[-len(session_salt):] == session_salt:
@@ -66,7 +66,7 @@ def decode_session_cookie(cookie):
         return None
 
 
-@app.route('/auth/login', methods=['GET', 'POST'])
+@app.route(custom_auth_url_prefix +'/login', methods=['GET', 'POST'])
 def show_login():
     if request.method == 'GET':
         target = request.headers.get(app.config['TARGET_HEADER'])
@@ -81,10 +81,10 @@ def show_login():
             resp.set_cookie(app.config['SESSION_COOKIE'], create_session_cookie(username))
             return resp
         else:
-            return render_template('login.html', realm=app.config['REALM_NAME'], error="Please check user name and password")
+            return render_template('login.html', realm=app.config['REALM_NAME'], error="Please check user name and password"), 401
 
 
-@app.route('/auth/validate', methods=['GET'])
+@app.route(custom_auth_url_prefix +'/validate', methods=['GET'])
 def validate():
     # check session
     session_cookie = request.cookies.get(app.config['SESSION_COOKIE'])

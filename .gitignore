@@ -4,3 +4,6 @@ env/
 dist/
 build/
 *.egg-info/
+.vscode/
+venv
+env

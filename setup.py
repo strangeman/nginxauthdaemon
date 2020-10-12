@@ -16,7 +16,7 @@ setup(
     version='1.0.0a3',
     description='Authentication daemon for nginx-proxied or nginx-served applications',
     long_description=long_description,
-    url='https://github.com/akurdyukov/nginxauthdaemon',
+    url='https://github.com/UnitedTraders/nginxauthdaemon',
     author='Alik Kurdyukov',
     author_email='akurdyukov@gmail.com',
     license='MIT',
@@ -43,16 +43,16 @@ setup(
     },
     install_requires=[
         'click==6.6',
-        'Crowd==1.0.0',
-        'Flask==0.11.1',
+        'Crowd==2.0.1',
+        'Flask==1.1.1',
         'itsdangerous==0.24',
-        'Jinja2==2.8',
-        'lxml==3.6.1',
+        'Jinja2==2.10.1',
+        'lxml==4.4.1',
         'MarkupSafe==0.23',
         'pyasn1==0.1.9',
-        'pycrypto==2.6.1',
-        'requests==2.11.0',
-        'Werkzeug==0.11.10'
+        'pycryptodome == 3.9.0',
+        'requests==2.20.0',
+        'Werkzeug==0.16.0'
     ],
     extras_require={
         'dev': ['check-manifest'],
